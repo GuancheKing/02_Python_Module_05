@@ -20,6 +20,7 @@ class DataProcessor(ABC):
         """Format the output string"""
         return f"Output: {result}"
 
+
 class NumericProcessor(DataProcessor):
 
     def process(self, data: Any) -> str:
@@ -48,7 +49,27 @@ class NumericProcessor(DataProcessor):
         return all(isinstance(each, (int, float)) for each in data)
 
 
-# class TextProcessor(DataProcessor):
+class TextProcessor(DataProcessor):
+    def process(self, data: Any) -> str:
+
+        print(f'Processing data: "{data}"')
+
+        if not self.validate(data):
+            return "Error, text data expected"
+
+        print("Validation: Text data verified")
+
+        count = len(data)
+        words = len(data.split())
+
+        result = (f"Processed text: {count} characters,"
+        f" {words} words")
+
+        return result
+    
+    def validate(self, data: Any) -> bool:
+
+        return isinstance(data, str)
 
 
 # class LogProcessor(DataProcessor):
@@ -56,12 +77,18 @@ class NumericProcessor(DataProcessor):
 
 def main() -> None:
     print("=== CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
+
     print("\nInitializing Numeric Processor...")
     num_data = [1, 2, 3, 4, 5]
     numeric = NumericProcessor()
     num_result = numeric.process(num_data)
     print(numeric.format_output(num_result))
 
+    print("\nInitializing Text Processor...")
+    text_data = "Hello Nexus World"
+    text = TextProcessor()
+    text_result = text.process(text_data)
+    print(text.format_output(text_result))
 
 if __name__ == "__main__":
     main()
