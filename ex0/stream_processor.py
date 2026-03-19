@@ -13,18 +13,55 @@ class DataProcessor(ABC):
 
     @abstractmethod
     def validate(self, data: Any) -> bool:
-        """alidate if data is appropriate for this processor"""
+        """Validate if data is appropriate for this processor"""
         pass
     
     def format_output(self, result: str) -> str:
         """Format the output string"""
-        return result
-    
+        return f"Output: {result}"
 
 class NumericProcessor(DataProcessor):
 
+    def process(self, data: Any) -> str:
 
-class TextProcessor(DataProcessor):
+        print(f"Processing data: {data}")
+
+        if not self.validate(data):
+            return "Error, numeric data expected"
+
+        print("Validation: Numeric data verified")
+
+        count = len(data)
+        total = sum(data)
+        average = total / count
+
+        result = (f"Processed {count} numeric values,"
+        f" sum={total}, avg={average}")
+
+        return result
+
+    def validate(self, data: Any) -> bool:
+        if not isinstance(data, list):
+            return False
+        if not data:
+            return False
+        return all(isinstance(each, (int, float)) for each in data)
 
 
-class LogProcessor(DataProcessor):
+# class TextProcessor(DataProcessor):
+
+
+# class LogProcessor(DataProcessor):
+
+
+def main() -> None:
+    print("=== CODE NEXUS - DATA PROCESSOR FOUNDATION ===")
+    print("\nInitializing Numeric Processor...")
+    num_data = [1, 2, 3, 4, 5]
+    numeric = NumericProcessor()
+    num_result = numeric.process(num_data)
+    print(numeric.format_output(num_result))
+
+
+if __name__ == "__main__":
+    main()
