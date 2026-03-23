@@ -108,8 +108,31 @@ class EventStream(DataStream):
     def process_batch(self, data_batch: List[Any]) -> str:
         if not isinstance(data_batch, list):
             raise ValueError("Error: Event data must be a list")
+        try:
+            error_count = 0
+            for reading in data_batch:
+                if "error" in str(reading):
+                    error_count += 1
+            count = len(data_batch)
+            if error_count == 1:
+                return (f"Event analysis: {count} events,"
+                        f" {error_count} error detected")
+            else:
+                return (f"Event analysis: {count} events,"
+                        f" {error_count} errors detected")
+        except (ValueError, TypeError, IndexError):
+            return "Error: Events batch contains invalid data"
 
 
+class StreamProcessor:
+    def __init__(self):
+        self.streams: List[DataStream] = []
+
+    def add_stream(self, stream: DataStream) -> None:
+        self.streams.append(stream)
+    
+    def process_all(self, batch: list[Any]) -> None:
+        criteria
 
 def main() -> None:
     print("=== CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
@@ -135,6 +158,11 @@ def main() -> None:
     print("\nInitializing Event Stream...")
     events = EventStream("EVENT_001")
     print(f"Stream ID: {events.stream_id}, Type: {events.stream_type}")
+    event_data = ["login", "error", "logout"]
+    event_result = events.process_batch(event_data)
+    print("Processing event batch: [login, error, logout]")
+    print(event_result)
+
 
 if __name__ == "__main__":
     main()
