@@ -35,7 +35,7 @@ class SensorStream(DataStream):
 
     def process_batch(self, data_batch: List[Any]) -> str:
         if not isinstance(data_batch, list):
-            raise ValueError("Error data must be a list")
+            raise ValueError("Error: Sensor data must be a list")
         try:
             readings = []
             for reading in data_batch:
@@ -69,24 +69,52 @@ class TransactionStream(DataStream):
     def __init__(self, stream_id: str) -> None:
         super().__init__(stream_id, "Financial Data")
 
-#    def process_batch(self, data_batch: List[Any]) -> str:
+    def process_batch(self, data_batch: List[Any]) -> str:
+        if not isinstance(data_batch, list):
+            raise ValueError("Error: Transaction data must be a list")
+        try:
+            buying = []
+            selling = []
+            for reading in data_batch:
+                if "buy:" in str(reading):
+                    buy_value = str(reading).split(":", 1)[1]
+                    buying.append(int(buy_value))
+                elif "sell:" in str(reading):
+                    sell_value = str(reading).split(":", 1)[1]
+                    selling.append(int(sell_value))
+            if not buying and not selling:
+                return "Transaction analysis: 0 operations processed"
+            else:
+                count = len(buying) + len(selling)
+                net = sum(buying) - sum(selling)
+                if sum(buying) > sum(selling):
+                    return (f"Transaction analysis: {count} operations,"
+                            f" net flow: +{net} units")
+                elif sum(buying) == sum(selling):
+                    return (f"Transaction analysis: {count} operations,"
+                            f" net flow: 0 units")
+                else:
+                    return (f"Transaction analysis: {count} operations,"
+                            f" net flow: {net} units")
+        except (ValueError, TypeError, IndexError):
+            return "Error: Transaction batch contains invalid data"
 
 
 class EventStream(DataStream):
 
     def __init__(self, stream_id: str) -> None:
-        super().__init__(stream_id)
+        super().__init__(stream_id, "System Events")
 
-#    def process_batch(self, data_batch: List[Any]) -> str:
+    def process_batch(self, data_batch: List[Any]) -> str:
+        if not isinstance(data_batch, list):
+            raise ValueError("Error: Event data must be a list")
 
-class TestStream(DataStream):
-    pass
 
 
 def main() -> None:
     print("=== CODE NEXUS - POLYMORPHIC STREAM SYSTEM ===")
 
-    print("Initializing Sensor Stream...")
+    print("\nInitializing Sensor Stream...")
     sensor = SensorStream("SENSOR_001")
     print(f"Stream ID: {sensor.stream_id}, Type: {sensor.stream_type}")
     sensor_data = [
@@ -97,7 +125,16 @@ def main() -> None:
     print(sensor_result)
 
     print("\nInitializing Transaction Stream...")
+    trans = TransactionStream("TRANS_001")
+    print(f"Stream ID: {trans.stream_id}, Type: {trans.stream_type}")
+    trans_data = ["buy:100", "sell:150", "buy:75"]
+    trans_result = trans.process_batch(trans_data)
+    print("Processing transaction batch: [buy:100, sell:150, buy:75]")
+    print(trans_result)
 
+    print("\nInitializing Event Stream...")
+    events = EventStream("EVENT_001")
+    print(f"Stream ID: {events.stream_id}, Type: {events.stream_type}")
 
 if __name__ == "__main__":
     main()

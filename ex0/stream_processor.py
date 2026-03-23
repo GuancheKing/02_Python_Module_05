@@ -69,7 +69,6 @@ class TextProcessor(DataProcessor):
 
     def validate(self, data: Any) -> bool:
         """Validate that the input is a string."""
-
         return isinstance(data, str)
 
 
@@ -134,8 +133,12 @@ def main() -> None:
 
     print("\n=== Polymorphic Processing Demo ===")
     print("Processing multiple data types through same interface...")
-    processors = [NumericProcessor(), TextProcessor(), LogProcessor()]
-    inputs = [[1, 2, 3], "Hello World!", "INFO: System ready"]
+    processors: list[DataProcessor] = [
+        NumericProcessor(),
+        TextProcessor(),
+        LogProcessor()
+        ]
+    inputs: list[Any] = [[1, 2, 3], "Hello World!", "INFO: System ready"]
     for processor, data in zip(processors, inputs):
         result = processor.process(data)
         print(processor.format_output(result))
