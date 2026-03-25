@@ -173,7 +173,7 @@ class StreamProcessor:
             raise ValueError("Number of streams and batches must match")
         for stream, batch in zip(self.streams, batches):
             print(f"\nProcessing {stream.stream_type.lower()}"
-                    f" batch: {batch}")
+                  f" batch: {batch}")
             result = stream.process_batch(batch)
             results.append(result)
             print(result)
